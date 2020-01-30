@@ -1,6 +1,6 @@
 # Aticom ReactJs
 
-Aplicação Web de auxilio e controle para completar atividades complementares, requisito para graduação, de acordo com o modelo da Universidade Estadual de Goiás usando [API própria em NodeJs](https://github.com/HigorJSilva/stock-it-NodeJs) para o backend 
+Aplicação Web de auxilio e controle para completar atividades complementares, requisito para graduação, de acordo com o modelo da Universidade Estadual de Goiás usando [API própria em NodeJs](https://github.com/HigorJSilva/Aticom) para o backend 
 
 ## Demo
 Tela inicial da aplicação demonstrando as funções básicas do software
