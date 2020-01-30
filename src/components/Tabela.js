@@ -24,9 +24,9 @@ import api from '../services/api';
 import { Fab } from '@material-ui/core';
 
 const tableIcons = {
-	Add: forwardRef((props, ref) => <Fab style={{borderRadius:'100%'}} color='primary' variant="contained">
+	Add: forwardRef((props, ref) => <Fab  color='primary'>
 	
-   <AddIcon small  color="#ffff" {...props} ref={ref} /></Fab>),
+   <AddIcon  {...props} ref={ref} /></Fab>),
 	Check: forwardRef((props, ref) => <Check  color="primary"{...props} ref={ref} />),
 	Clear: forwardRef((props, ref) => <Clear color="secondary"{...props} ref={ref} />),
 	Delete: forwardRef((props, ref) => <DeleteOutline  color="secondary"{...props} ref={ref} />),
@@ -75,6 +75,16 @@ export default function MaterialTableDemo() {
 		)
 	},
 		{ title: 'Referência', field: 'referencia',
+		editComponent: props => (
+			<TextField
+				value={props.value}
+				fullWidth={true}
+				multiline={true}
+				InputLabelProps={{
+					shrink: true
+				}}
+			onChange={e => props.onChange(e.target.value)}
+			/>)
 		
 	},
 		{ title: 'Id', field: '_id', hidden:true,
@@ -143,8 +153,8 @@ export default function MaterialTableDemo() {
 		newPost.append('presencial',e.presencial);
 		newPost.append('horasCertificado',e.horasCertificado);
 		return await api.post('/new', newPost).then(function(result) {
-			console.log( result.data.success)
-			return result.data.success
+			console.log(result.data)
+			return result.data
 		});	
 	}
 
@@ -156,9 +166,10 @@ async function handleUpdate(e){
 	newPost.append('modalidade', e.modalidade);
 	newPost.append('presencial', e.presencial);
 	newPost.append('horasCertificado', e.horasCertificado);
+	console.log(e);
 	return await api.post('/edit/'+ e._id, newPost).then(function(result) {
-		console.log( result.data.success)
-		return result.data.success
+		console.log( result.data)
+		return result.data
 	});	
 }
 
@@ -190,13 +201,14 @@ async function handleDelete(e){
 				resolve();
 				const data = [...state.data];
 				await handleSend(newData).then(function(result) {
-					if(result){
-						newData.horasCertificado>40 ? newData.horasConsideradas = 40 : newData.horasConsideradas = newData.horasCertificado
+					if(result.success){
+						newData.horasCertificado > 40 ? newData.horasConsideradas = 40 : newData.horasConsideradas = newData.horasCertificado
+						newData._id =  result.message;
 						data.push(newData);
 						setState({ ...state, data });
 					}
 					else{
-						//ESCREVER ERRO AQUI
+						console.log("eeeeeeeeeeerro");
 					}
 					
 				});

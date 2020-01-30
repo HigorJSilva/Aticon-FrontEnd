@@ -5,13 +5,14 @@ import Box from '@material-ui/core/Box';
 import {Card, CardContent} from '@material-ui/core/';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
-
 import LinearProgress from '@material-ui/core/LinearProgress';
-
 import Tabela from '../components/Tabela';
-import Fab from '../components/Fab';
+import SendModal from '../components/CompletedModal';
+import Drawer from '../components/Drawer';
+
 import api from '../services/api';
 import 'typeface-roboto';
+import './modal.css';
 
 
 const styles = theme => ({
@@ -33,7 +34,8 @@ const styles = theme => ({
 		display: 'flex',
 		flexDirection: 'row',
 		justifyContent: 'space-around',
-		marginBottom: '8px'
+		marginBottom: '8px',
+		flexWrap: 'wrap',
 	},
 
 	card:{
@@ -47,21 +49,21 @@ const styles = theme => ({
 });
 
 
-
 class Index extends Component {
 
 	constructor(props) {
         super(props);
         this.state = {
 			modulo: [],
-			textoAjuda:[],
-        };
+			checked: true,
+		};
+		// this.sweetAlert = this.sweetalertfunction.bind(this);
       }
 
 
 	async getDados(){
 		let response = [];
-		response = await api.get('/5d4ad48d469d2419e445ecd9');
+		response = await api.get('/modulos');
 		this.setState({ modulo: response.data });
 	}
 
@@ -82,13 +84,13 @@ class Index extends Component {
 	const BorderLinearProgress = withStyles({
 		root: {
 		  height: 10,
-		  backgroundColor: lighten('#3F7829', 0.5),
+		  backgroundColor: lighten('#009C4D', 0.5),
 		  alignItems: 'center',
 		  width: '102%'
 		},
 		bar: {
 		  borderRadius: 20,
-		  backgroundColor: '#3F7829',
+		  backgroundColor: '#009C4D',
 		},
 	  })(LinearProgress);
 	 
@@ -99,12 +101,14 @@ class Index extends Component {
         <React.Fragment>
 			
         	<CssBaseline  />
+			<Drawer/>
 			<div style={{background: '#F7F7F7'}}>
         <Box className={classes.container} >
 			
 		<Typography variant={'h4'} color={'secondary'} weight={300} bottomspace={'small'}>
     		Atividades
   		</Typography>
+		  
 
 		<Typography color={'textSecondary'} style={{ marginLeft: '20px'} } bottomspace={'small'}>
 			Acompanhe seu progresso
@@ -123,7 +127,9 @@ class Index extends Component {
 								<Grid container spacing={2} style={{padding: '0px'}}>
 									<Grid item xs={12} >
 										<Typography variant="h4">
-										{this.state.modulo.modulo1} horas 
+										{this.state.modulo.modulo1} 
+										{this.state.modulo.modulo1 === 1 || this.state.modulo.modulo1 === undefined  ? ' 0 horas' 
+													: ' horas' }
 										</Typography>
 									</Grid>
 									<Grid item xs={3} sm container style={{padding: '0px'}}>
@@ -134,6 +140,7 @@ class Index extends Component {
 
 													{this.state.modulo.modulo1 >= 45 ? '/105 horas max.' 
 													: '/45 horas min.' }
+													
 
 												</Typography>
 											
@@ -158,7 +165,9 @@ class Index extends Component {
 								<Grid container spacing={2} style={{padding: '0px'}}>
 									<Grid item xs={12} >
 										<Typography variant="h4">
-										{this.state.modulo.modulo2} horas
+										{this.state.modulo.modulo2} 
+										{this.state.modulo.modulo2 === 1 || this.state.modulo.modulo2 === undefined  ? ' 0 horas' 
+													: ' horas' } 
 										</Typography>
 									</Grid>
 									<Grid item xs={3} sm container style={{padding: '0px'}}>
@@ -192,7 +201,9 @@ class Index extends Component {
 								<Grid container spacing={2} style={{padding: '0px'}}>
 									<Grid item xs={12} >
 										<Typography variant="h4">
-										{this.state.modulo.modulo3} horas
+										{this.state.modulo.modulo3} 
+										{this.state.modulo.modulo3 === 1 || this.state.modulo.modulo3 === undefined  ? ' 0 horas' 
+													: ' horas' }
 										</Typography>
 									</Grid>
 									<Grid item xs={3} sm container style={{padding: '0px'}}>
@@ -226,7 +237,9 @@ class Index extends Component {
 								<Grid container spacing={2} style={{padding: '0px'}}>
 									<Grid item xs={12} >
 										<Typography variant="h4">
-										{this.state.modulo.presencial}
+										{/* {this.state.modulo.presencial} */}
+										{this.state.modulo.presencial === undefined  ? ' 0 %' 
+													: this.state.modulo.presencial+' %'}
 										</Typography>
 									</Grid>
 									<Grid item xs={3} sm container style={{padding: '0px'}}>
@@ -250,21 +263,27 @@ class Index extends Component {
 			<Box className={classes.progressBar}> 
 			{/* <Grid container spacing={3} > */}
 				<Grid item xs={10} style={{alignSelf: 'center'}} >
-					<BorderLinearProgress variant="determinate"  color="secondary" value={Number(this.state.modulo.total)} />
+					<BorderLinearProgress variant="determinate"  color="secondary" value={
+						(this.state.modulo.total !== undefined ) ? Number(this.state.modulo.total) : Number('0')
+						} />
 				</Grid>
 				 <Grid item  style={{display: 'inline-block'}}> 
 					<Typography variant="h4" style={{display: 'inline-block'}}>
-						{this.state.modulo.total}
+					{
+						(this.state.modulo.total !== undefined ) ? Number(this.state.modulo.total) : 0
+						}
 						</Typography>
 						<Typography variant="body2" gutterBottom style={{display: 'inline-block'}}>
 							/150
 						</Typography>
-					 </Grid> 
-			{/* </Grid> */}
+					 </Grid>
+
+			{/* <SendModal/> */}
+
 			</Box>
+
 			<Tabela/>
         </Box>
-		<Fab />
 		</div>
     </React.Fragment>);
   }

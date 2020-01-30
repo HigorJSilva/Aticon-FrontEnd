@@ -1,0 +1,14 @@
+.test{
+    display: 'inline';
+    margin: 8px;
+}
+.actions{
+    display: flex;
+    z-index: 1;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    /* flex-direction: column; */
+    width: 100%;
+    margin: 1.25em auto 0;
+}
