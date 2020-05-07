@@ -18,10 +18,13 @@ import Search from '@material-ui/icons/Search';
 import ViewColumn from '@material-ui/icons/ViewColumn';
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
+// import Autocomplete from '@material-ui/lab/Autocomplete';
 
 
 import api from '../services/api';
 import { Fab } from '@material-ui/core';
+import Swal from 'sweetalert2';
+import { config } from '../_helpers/config';
 
 const tableIcons = {
 	Add: forwardRef((props, ref) => <Fab  color='primary'>
@@ -46,6 +49,10 @@ const tableIcons = {
 };
 
 export default function MaterialTableDemo() {
+	const defaultProps = {
+		options: config.referencia,
+		getOptionLabel: config.referencia
+	  };
   const [state, setState] = React.useState({
 		
 	titulo: <div>
@@ -58,6 +65,7 @@ export default function MaterialTableDemo() {
  	</div>
  
   ,
+  
   
 	columns: [
 		{ title: 'Descrição', field: 'descricao',
@@ -76,15 +84,22 @@ export default function MaterialTableDemo() {
 	},
 		{ title: 'Referência', field: 'referencia',
 		editComponent: props => (
-			<TextField
-				value={props.value}
-				fullWidth={true}
-				multiline={true}
-				InputLabelProps={{
-					shrink: true
-				}}
-			onChange={e => props.onChange(e.target.value)}
-			/>)
+			// <Autocomplete
+			// 	id="select-on-focus"
+			// 	{...defaultProps}
+			// 	selectOnFocus
+				// renderInput={
+					<TextField
+						value={props.value}
+						fullWidth={true}
+						multiline={true}
+						InputLabelProps={{
+							shrink: true
+						}}
+						onChange={e => props.onChange(e.target.value)}
+					/>
+				// }/>
+				)
 		
 	},
 		{ title: 'Id', field: '_id', hidden:true,
@@ -98,7 +113,7 @@ export default function MaterialTableDemo() {
 		  editComponent: props => (
 			<TextField
 				value={props.value}
-				fullWidth={true}
+			
 				multiline={true}
 				InputLabelProps={{
 				shrink: true
@@ -116,14 +131,27 @@ export default function MaterialTableDemo() {
 			field: 'presencial',
 			lookup: { 'false': 'Distância', 'true': 'Presencial' },
 		},
-		{ title: 'Hrs. Certificado', field: 'horasCertificado', type: 'numeric',  },
+		{ title: 'Hrs. Certificado', field: 'horasCertificado', type: 'numeric', 
+		ditComponent: props => (
+			<TextField
+				value={props.value}
+				InputProps={{
+					inputProps: { 
+						min: 2
+					}
+				}}
+				multiline={true}
+				inputProps={{ min: 0}}
+				InputLabelProps={{
+					shrink: true
+			  	}}
+			onChange={e => props.onChange(e.target.value)}
+		/> )},
 		{ title: 'Hrs. Conseideradas', field: 'horasConsideradas', type: 'numeric', 
 		editComponent: props => (
 			<TextField
 				disabled
 				value={props.value}
-				fullWidth={true}
-				multiline={true}
 				InputLabelProps={{
 				shrink: true
 			  }}
@@ -136,8 +164,31 @@ export default function MaterialTableDemo() {
 
   // Inicialização dos dados
   	async function onLoad(){
-		const response = await api.get('/');
-		setState({ ...state, data: response.data });
+		// const response = await api.get('/');
+		// setState({ ...state, data: response.data });
+		setState({ ...state, data: [{
+        "_id": "5e9254bdf328930928a2a7d2",
+        "aluno": "5e2320f393c7e30de8ff5def",
+        "descricao": "1º Congresso de Python do Centro Oeste",
+        "modalidade": "II",
+        "referencia": "Instrutor em palestras técnicas, seminários, grupos de estudos, cursos da área específica de formação, não remunerados e de interesse da sociedade;",
+        "presencial": false,
+        "horasCertificado": 10,
+        "horasConsideradas": 10,
+        "__v": 0
+    },
+    {
+        "_id": "5e9258cfc2087a2c082833f6",
+        "aluno": "5e2320f393c7e30de8ff5def",
+        "descricao": "3º Congresso de Python do Centro Oeste",
+        "modalidade": "I",
+        "referencia": "Palestrante",
+        "presencial": true,
+        "horasCertificado": 20,
+        "horasConsideradas": 20,
+        "__v": 0
+    }] });
+
 	}
 	
 	React.useEffect(() => {
@@ -166,9 +217,8 @@ async function handleUpdate(e){
 	newPost.append('modalidade', e.modalidade);
 	newPost.append('presencial', e.presencial);
 	newPost.append('horasCertificado', e.horasCertificado);
-	console.log(e);
 	return await api.post('/edit/'+ e._id, newPost).then(function(result) {
-		console.log( result.data)
+		// console.log( result.data)
 		return result.data
 	});	
 }
@@ -182,18 +232,18 @@ async function handleDelete(e){
 }
 
 
-
   return (
 
 	<>
-    <MaterialTable
-      icons={tableIcons}
-      title={state.titulo}
-      columns={state.columns}
-	  data={state.data}
-	  options={{
-		actionsColumnIndex: -1
-	}}
+	<MaterialTable
+		icons={tableIcons}
+		title={state.titulo}
+		columns={state.columns}
+		data={state.data}
+		options={{
+			actionsColumnIndex: -1,
+		}}
+		
       editable={{
         onRowAdd: newData =>
           new Promise(resolve => {
@@ -208,7 +258,11 @@ async function handleDelete(e){
 						setState({ ...state, data });
 					}
 					else{
-						console.log("eeeeeeeeeeerro");
+						Swal.fire({
+							icon: 'error',
+							title: 'Valor inválido',
+							text: result.message,
+						})
 					}
 					
 				});
@@ -220,16 +274,21 @@ async function handleDelete(e){
               resolve();
 			  
 			  await handleUpdate(newData).then(function(result) {
-				if(result){
+				//   console.log(result.success)
+				if(result.success){
+
 					const data = [...state.data];
 					newData.horasCertificado>40 ? newData.horasConsideradas = 40 : newData.horasConsideradas = newData.horasCertificado
-
-					
 					data[data.indexOf(oldData)] = newData;
               		setState({ ...state, data });
 				}
 				else{
-					//ESCREVER ERRO AQUI
+					
+					Swal.fire({
+						icon: 'error',
+						title: 'Valor inválido',
+						text: result.message,
+					})
 				}
 				
 			});

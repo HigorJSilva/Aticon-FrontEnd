@@ -8,11 +8,11 @@ import Typography from '@material-ui/core/Typography';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import Tabela from '../components/Tabela';
 import SendModal from '../components/CompletedModal';
-import Drawer from '../components/Drawer';
-
 import api from '../services/api';
+
 import 'typeface-roboto';
-import './modal.css';
+import '../styles/modal.css';
+import Swal from 'sweetalert2';
 
 
 const styles = theme => ({
@@ -67,6 +67,27 @@ class Index extends Component {
 		this.setState({ modulo: response.data });
 	}
 
+	async gerarPlanilha(){
+		let fileLocation = [];
+		fileLocation = await api.get('/gerarPlanilha');
+
+		setTimeout(() => {
+
+			Swal.fire({
+				icon: 'success',
+				title: 'Planilha gerada',
+				html: "<a href="+api.defaults.baseURL+ '/files/planilhas/'+fileLocation.data+"> Baixar planílha </a>",
+				showConfirmButton: true,
+			  }).then((result) => {
+					api.get('/deletarPlanilha');
+			  })  
+
+			  
+			
+		  }, 100);
+
+	}
+
 	componentDidMount(){		
 		this.getDados();
 		
@@ -101,7 +122,6 @@ class Index extends Component {
         <React.Fragment>
 			
         	<CssBaseline  />
-			<Drawer/>
 			<div style={{background: '#F7F7F7'}}>
         <Box className={classes.container} >
 			
@@ -113,6 +133,9 @@ class Index extends Component {
 		<Typography color={'textSecondary'} style={{ marginLeft: '20px'} } bottomspace={'small'}>
 			Acompanhe seu progresso
 		</Typography>
+
+		{/* <Button onClick={this.gerarPlanilha}> Gerar planilha</Button> */}
+
 			<Box className={classes.progressoContainer}>
 				
 						<Card className={classes.card} >
@@ -230,7 +253,7 @@ class Index extends Component {
 								<Grid container spacing={2}>
          							<Grid item style={{padding: '0px'}}>
 										<Typography className={classes.title} gutterBottom>
-											% A distância
+											% Presencial
 										</Typography>
 									</Grid>
 								</Grid>
@@ -281,8 +304,8 @@ class Index extends Component {
 			{/* <SendModal/> */}
 
 			</Box>
-
 			<Tabela/>
+			
         </Box>
 		</div>
     </React.Fragment>);

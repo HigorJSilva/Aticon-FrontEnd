@@ -9,8 +9,7 @@ import PersonIcon from '@material-ui/icons/Person';
 import Avatar from '@material-ui/core/Avatar';
 import api from '../services/api'
 
-import './feed.css';
-import Drawer from '../components/Drawer';
+import '../styles/feed.css';
 
 const styles = theme => ({
     container: {
@@ -108,7 +107,6 @@ class Feed extends Component{
                         {/* <img src={more} alt="Mais"/>                         */}
                     </header>
                     <img src={api.defaults.baseURL+ '/files/eventos/' + post.imagem} alt="" />
-                    {/* <img src="http://localhost:3333/files/eventos/teste.png" alt="" /> */}
                     <footer>
                         <div className="actions">
                     
@@ -139,7 +137,7 @@ class Feed extends Component{
 
         return(
             <div>
-            <Drawer/>
+            {/* <Drawer/> */}
             <Box className={classes.container}>
                 {/* <Header/> */}
                 <Typography variant={'h4'} color={'secondary'} weight={300} bottomspace={'small'}>
