@@ -18,8 +18,7 @@ import Search from '@material-ui/icons/Search';
 import ViewColumn from '@material-ui/icons/ViewColumn';
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
-// import Autocomplete from '@material-ui/lab/Autocomplete';
-
+import Autocomplete from '@material-ui/lab/Autocomplete';
 
 import api from '../services/api';
 import { Fab } from '@material-ui/core';
@@ -49,11 +48,20 @@ const tableIcons = {
 };
 
 export default function MaterialTableDemo() {
-	const defaultProps = {
-		options: config.referencia,
-		getOptionLabel: config.referencia
-	  };
-  const [state, setState] = React.useState({
+
+	var  titulos =[];
+	const options = config.referencia.map((option) => {
+		// console.log(option.modulo)
+		const modulo = option.modulo[0].toUpperCase();
+		titulos.push(option.titulo)
+		return {
+		  modulo: /[0-9]/.test(modulo) ? '0-9' : modulo,
+		  ...option,
+		};
+	  });
+
+
+  	const [state, setState] = React.useState({
 		
 	titulo: <div>
 	<Typography  style={{display: 'inline-block'}} variant='h6' color={'secondary'}  bottomspace={'small'}> 
@@ -69,10 +77,17 @@ export default function MaterialTableDemo() {
   
 	columns: [
 		{ title: 'Descrição', field: 'descricao',
+		cellStyle: {
+			minWidth: 150,
+			maxWidth: 250,
+			paddingRight:'0px'
+		  },
 		
 		editComponent: props => (
 			<TextField
+				required={true}
 				value={props.value}
+				placeholder='Descrição'
 				fullWidth={true}
 				multiline={true}
 				InputLabelProps={{
@@ -83,23 +98,33 @@ export default function MaterialTableDemo() {
 		)
 	},
 		{ title: 'Referência', field: 'referencia',
+		cellStyle: {
+			minWidth: 250,
+			maxWidth: 300
+		  },
 		editComponent: props => (
-			// <Autocomplete
-			// 	id="select-on-focus"
-			// 	{...defaultProps}
-			// 	selectOnFocus
-				// renderInput={
-					<TextField
-						value={props.value}
-						fullWidth={true}
-						multiline={true}
-						InputLabelProps={{
-							shrink: true
-						}}
-						onChange={e => props.onChange(e.target.value)}
-					/>
-				// }/>
-				)
+				<Autocomplete
+					id="referencia"
+					disableClearable
+					size="small"
+					value={config.referencia[titulos.indexOf(props.value)]}
+					options={config.referencia}
+					// groupBy={(option) => 'Módulo '+option.modulo}
+					getOptionLabel={(option) => option.titulo}
+					renderInput={(params) => { 
+						return(
+							<TextField
+								{...params}
+								value={props.value}
+								label=""
+								placeholder='Referência'
+								margin="normal"
+								multiline={true} 
+							/>
+							);}}
+					onChange={e => props.onChange(e.target.innerText)}
+				/>
+			)
 		
 	},
 		{ title: 'Id', field: '_id', hidden:true,
@@ -113,7 +138,6 @@ export default function MaterialTableDemo() {
 		  editComponent: props => (
 			<TextField
 				value={props.value}
-			
 				multiline={true}
 				InputLabelProps={{
 				shrink: true
@@ -121,17 +145,26 @@ export default function MaterialTableDemo() {
 			onChange={e => props.onChange(e.target.value)}
 		/> )
 		},
+		//TODO: width 100%
 		{
 			title: 'Modalidade',
 			field: 'modalidade',
-			lookup: { 'I': 'I', 'II': 'II', 'III': 'III' },
+			lookup: { 'I': 'I', 'II': 'II', 'III': 'III' }, headerStyle:{
+				textAlign: "center",
+			}, cellStyle: {
+				textAlign: "center"
+			},
 		},
 		{
 			title: 'Regime',
 			field: 'presencial',
 			lookup: { 'false': 'Distância', 'true': 'Presencial' },
 		},
-		{ title: 'Hrs. Certificado', field: 'horasCertificado', type: 'numeric', 
+		{ title: 'Hrs. Certificado', field: 'horasCertificado', type: 'numeric', headerStyle:{
+			textAlign: "center",
+		}, cellStyle: {
+			textAlign: "center"
+		},
 		ditComponent: props => (
 			<TextField
 				value={props.value}
@@ -147,7 +180,11 @@ export default function MaterialTableDemo() {
 			  	}}
 			onChange={e => props.onChange(e.target.value)}
 		/> )},
-		{ title: 'Hrs. Conseideradas', field: 'horasConsideradas', type: 'numeric', 
+		{ title: 'Hrs. Consedeiradas', field: 'horasConsideradas', type: 'numeric', headerStyle:{
+			textAlign: "center",
+		}, cellStyle: {
+			textAlign: "center"
+		},
 		editComponent: props => (
 			<TextField
 				disabled
@@ -164,49 +201,32 @@ export default function MaterialTableDemo() {
 
   // Inicialização dos dados
   	async function onLoad(){
-		// const response = await api.get('/');
-		// setState({ ...state, data: response.data });
-		setState({ ...state, data: [{
-        "_id": "5e9254bdf328930928a2a7d2",
-        "aluno": "5e2320f393c7e30de8ff5def",
-        "descricao": "1º Congresso de Python do Centro Oeste",
-        "modalidade": "II",
-        "referencia": "Instrutor em palestras técnicas, seminários, grupos de estudos, cursos da área específica de formação, não remunerados e de interesse da sociedade;",
-        "presencial": false,
-        "horasCertificado": 10,
-        "horasConsideradas": 10,
-        "__v": 0
-    },
-    {
-        "_id": "5e9258cfc2087a2c082833f6",
-        "aluno": "5e2320f393c7e30de8ff5def",
-        "descricao": "3º Congresso de Python do Centro Oeste",
-        "modalidade": "I",
-        "referencia": "Palestrante",
-        "presencial": true,
-        "horasCertificado": 20,
-        "horasConsideradas": 20,
-        "__v": 0
-    }] });
-
+		const response = await api.get('/');
+		setState({ ...state, data: response.data });
 	}
 	
 	React.useEffect(() => {
 		onLoad();
-	}, []);
+	},);
 
 	// salvar dados
   async function handleSend(e){
 		const newPost = new FormData();
-		newPost.append('descricao', e.descricao);
-		newPost.append('referencia', e.referencia);
-		newPost.append('modalidade',e.modalidade);
-		newPost.append('presencial',e.presencial);
-		newPost.append('horasCertificado',e.horasCertificado);
-		return await api.post('/new', newPost).then(function(result) {
-			console.log(result.data)
-			return result.data
-		});	
+		// if(validate(e)){
+			newPost.append('descricao', e.descricao);
+			newPost.append('referencia', e.referencia);
+			newPost.append('modalidade',e.modalidade);
+			newPost.append('presencial',e.presencial);
+			newPost.append('horasCertificado',e.horasCertificado);
+			return await api.post('/new', newPost).then(function(result) {
+				console.log(result.data)
+				return result.data
+			});	
+		// }
+		// else{
+		// 	var result = {success: false, };
+		// 	return result;
+		// }
 	}
 
 	// alterar dados
@@ -243,7 +263,6 @@ async function handleDelete(e){
 		options={{
 			actionsColumnIndex: -1,
 		}}
-		
       editable={{
         onRowAdd: newData =>
           new Promise(resolve => {
@@ -251,16 +270,21 @@ async function handleDelete(e){
 				resolve();
 				const data = [...state.data];
 				await handleSend(newData).then(function(result) {
+					console.log(result.success)
 					if(result.success){
 						newData.horasCertificado > 40 ? newData.horasConsideradas = 40 : newData.horasConsideradas = newData.horasCertificado
 						newData._id =  result.message;
 						data.push(newData);
 						setState({ ...state, data });
+						Swal.fire({
+							icon: 'success',
+							title: 'Atividade cadastrada',
+						})
 					}
 					else{
 						Swal.fire({
 							icon: 'error',
-							title: 'Valor inválido',
+							title: 'Atividade inválida',
 							text: result.message,
 						})
 					}
@@ -280,13 +304,17 @@ async function handleDelete(e){
 					const data = [...state.data];
 					newData.horasCertificado>40 ? newData.horasConsideradas = 40 : newData.horasConsideradas = newData.horasCertificado
 					data[data.indexOf(oldData)] = newData;
-              		setState({ ...state, data });
+					  setState({ ...state, data });
+					  Swal.fire({
+						icon: 'success',
+						title: 'Atividade alterada',
+					})
 				}
 				else{
 					
 					Swal.fire({
 						icon: 'error',
-						title: 'Valor inválido',
+						title: 'Atividade inválida',
 						text: result.message,
 					})
 				}
@@ -304,14 +332,20 @@ async function handleDelete(e){
 			  await handleDelete(oldData).then(function(result) {
 				if(result){
 					data.splice(data.indexOf(oldData), 1);
-              		setState({ ...state, data });
+					  setState({ ...state, data });
+					  Swal.fire({
+						icon: 'success',
+						title: 'Atividade removida',
+					})
 				}
 				else{
-					//ESCREVER ERRO AQUI
+					Swal.fire({
+						icon: 'error',
+						title: 'Houve um erro',
+						text: 'Tente novamente',
+					})
 				}
 			  });
-            //   data.splice(data.indexOf(oldData), 1);
-            //   setState({ ...state, data });
             }, 600);
           }),
 	  }}
@@ -319,9 +353,14 @@ async function handleDelete(e){
 	  
 
 	  localization={{
+		  
         pagination: {
 			labelDisplayedRows: 'Mostrando {from}-{to} de {count}',
-			labelRowsSelect: 'linhas'
+			labelRowsSelect: 'linhas',
+			firstTooltip: 'Primeira página',
+			previousTooltip: 'Página anterior',
+			nextTooltip: 'Próxima página',
+			lastTooltip: 'Última página'
         },
         toolbar: {
 			nRowsSelected: '{0} linha(s) selecionada(s)',
@@ -339,7 +378,10 @@ async function handleDelete(e){
 				deleteText: 'Deseja deletar essa atividade',
 				cancelTooltip:'Cancelar',
 				saveTooltip: 'Salvar'
-			}
+			},
+			addTooltip:'Adicionar',
+			editTooltip:'Editar',
+			deleteTooltip:'Deletar',
 			
 		},
 

@@ -3,7 +3,7 @@ import {Button} from '@material-ui/core/';
 
 import swal from '@sweetalert/with-react'
 import Swal from 'sweetalert2'
-import Upload from '../pages/upload';
+import Upload from '../pages/Atividades/upload';
 
 import '../styles/modal.css'
 
@@ -11,30 +11,41 @@ import '../styles/modal.css'
 
 class Modal extends Component {
     constructor(props) {
-        super(props);
+		super(props);
         this.state = {
             titulo: "",
             corpo: "",
             footer: "",
 		};
-    this.sweetAlert = this.sweetalertfunction.bind(this);
-    this.renderUpload = this.renderUploadfunction.bind(this);
+		this.sweetAlert = this.sweetalertfunction.bind(this);
+		this.renderUpload = this.renderUploadfunction.bind(this);
+		this.handleTeste = this.handleTeste.bind(this);
     }
+
+    handleTeste(modalResponse){
+		this.setState({status: modalResponse});
+		console.log(this.state.status+' '+modalResponse)
+		
+		this.props.onModalResponse(modalResponse); 
+		return 1;
+  	}
 
     renderUploadfunction(){
-      return <Upload/>
+     	 return <Upload/>
     }
 
-      sweetalertfunction(){
-        const modal = Swal.mixin({
-          customClass: {
-            confirmButton: 'MuiButton-root MuiButton-contained MuiButton-containedPrimary test',
-            cancelButton: 'MuiButtonBase-root MuiButton-root MuiButton-outlined MuiButton-outlinedPrimary',
-            actions: 'actions',
-          },
-          buttonsStyling: false
-        })
-       
+      sweetalertfunction(self){
+
+	// console.log(self.handleTeste)
+		const modal = Swal.mixin({
+			customClass: {
+				confirmButton: 'MuiButton-root MuiButton-contained MuiButton-containedPrimary test',
+				cancelButton: 'MuiButtonBase-root MuiButton-root MuiButton-outlined MuiButton-outlinedPrimary',
+				actions: 'actions',
+			},
+			buttonsStyling: false
+		})
+
         modal.fire({
             title: 'Você completou suas atividades!',
             icon: 'success',
@@ -47,22 +58,24 @@ class Modal extends Component {
             cancelButtonText: 'Agora não',
             cancelButtonAriaLabel: 'Agora não',
             footer: '<a class="MuiTypography-root MuiLink-root MuiLink-underlineHover MuiTypography-colorTextSecondary" href='+window.location.origin + '/ajuda> Ajuda </a>',
-          }).then((result) => {
-              if (result.value) { 
+          	}).then((result) => {
+            	if (result.value) { 
                 swal({
                   className: "upload-modal",
-                  content: (<Upload/>),
-                }
-                )
+                  confirmButtonText: 'Finalizar',
+                  
+                  content: (<Upload fechar={swal.close} onModalResponse={self.handleTeste} />),
+                })  
               }
             })
 	}
     
   render() {
+    let buttonText = (this.props.disabled)? 'Aguardando Correção' : 'Enviar Atividades' 
     return 	(
       <div>
-        <Button variant="outlined" color='secondary' 
-        onClick={this.sweetalertfunction}> Enviar</Button>	
+        <Button variant="outlined" color='secondary' disabled={this.props.disabled} fullWidth
+        onClick={() => this.sweetalertfunction(this)}> {buttonText} </Button>	
       </div>)
   }
 }

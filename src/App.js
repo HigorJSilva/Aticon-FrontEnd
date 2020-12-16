@@ -1,5 +1,5 @@
 import React from 'react';
-import { Router, Route, Link } from 'react-router-dom';
+import { Router } from 'react-router-dom';
 
 import { history} from './_helpers/history';
 import { Role} from './_helpers/Role';
@@ -29,26 +29,17 @@ class App extends React.Component {
 
     logout() {
         authenticationService.logout();
-        history.push('/login');
+        window.location.href='/login'
     }
 
     render() {
         const { currentUser, isAdmin } = this.state;
         return (
             <Router history={history}>
-               {console.log(currentUser)}
                 <div> 
-                    <Drawer/>
-                    {/* {currentUser &&
+                    {currentUser &&
                     <Drawer logout={this.logout} isAdmin={isAdmin} />
-                        // <nav className="navbar navbar-expand navbar-dark bg-dark">
-                        //     <div className="navbar-nav">
-                        //         <Link to="/" className="nav-item nav-link">Home</Link>
-                        //         {isAdmin && <Link to="/admin" className="nav-item nav-link">Admin</Link>}
-                        //         <a onClick={this.logout} className="nav-item nav-link">Logout</a>
-                        //     </div>
-                        // </nav>
-                    } */}
+                    }
                 </div>
                 <Routes/>
             </Router>

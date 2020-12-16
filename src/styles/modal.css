@@ -15,3 +15,7 @@
 .upload-modal{
     width:800px;
 }
+.my-swal {
+    z-index: 100000000000;
+  }
+  

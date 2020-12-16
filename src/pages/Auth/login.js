@@ -11,7 +11,7 @@ import Grid from '@material-ui/core/Grid';
 import Link from '@material-ui/core/Link';
 import jsonWebTokenService from 'jsonwebtoken'
 import { Redirect } from 'react-router-dom';
-import {authenticationService} from '../services/authenticationService'
+import {authenticationService} from '../../services/authenticationService'
 
 const styles = theme => ({
   '@global': {
@@ -69,15 +69,20 @@ class Login extends Component {
 		if(!this.validate()){
 
 			let response = [];
-			response = await authenticationService.login(this.state.email,this.state.senha)
+			response = await authenticationService.login((this.state.email).toLocaleLowerCase(),this.state.senha)
 			
 			
 			if(response.user){
 				this.saveJwt(response.token);
-				if(response.user.role === "Admin")
-					this.setState({homePage: "/eventos"});
-				else
-					this.setState({homePage: "/"});
+				if(response.user.role === "Admin"){
+        
+          this.setState({homePage: "/dashboard"});
+        }
+				
+        else{
+          this.setState({homePage: "/atividades"});
+        }
+          
 				this.setState({success: true})
 			}
 			else{
@@ -114,7 +119,7 @@ class Login extends Component {
 	  async saveJwt (jwt) {
         try {  
 
-            const decodedJwt = jsonWebTokenService.decode(jwt)
+            // const decodedJwt = jsonWebTokenService.decode(jwt)
 			      await this.localStorage.setItem('jwtToken', jwt)
 			
             // await this.localStorage.setItem('dados_usuario', JSON.stringify(decodedJwt))
@@ -132,6 +137,7 @@ class Login extends Component {
   render() {
     const { classes } = this.props;
     if (this.state.success) {
+      console.log('object :>> ', this.state.homePage);
       return <Redirect to={this.state.homePage} />;
     }
     return (
@@ -197,7 +203,7 @@ class Login extends Component {
             </Button>
             <Grid container>
                 <Grid item xs>
-					<Link href="#" variant="body2">
+					<Link href="/esquecisenha" variant="body2">
 						Esqueceu a senha?
 					</Link>
                 </Grid>

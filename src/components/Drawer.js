@@ -8,17 +8,16 @@ import Typography from '@material-ui/core/Typography';
 import Badge from '@material-ui/core/Badge';
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
-import Link from '@material-ui/core/Link';
-import { NavLink } from 'react-router-dom'
 
 import AtividadesIcon from '@material-ui/icons/Assessment';
 import EventosIcon from '@material-ui/icons/CalendarToday'
 import AccountCircle from '@material-ui/icons/AccountCircle';
-import MailIcon from '@material-ui/icons/Mail';
 import MoreIcon from '@material-ui/icons/MoreVert';
+import HelpOutlineIcon from '@material-ui/icons/Help';
+import DashboardIcon from '@material-ui/icons/Dashboard';
 
 import {authenticationService} from '../services/authenticationService';
-import { CssBaseline } from '@material-ui/core';
+import { CssBaseline, Tooltip } from '@material-ui/core';
 
 const styles = theme => ({
   grow: {
@@ -84,10 +83,34 @@ const styles = theme => ({
 
 class Drawer extends React.Component {
 	state = { 
-		anchorEl: null,
-		mobileMoreAnchorEl: null 
+		anchorEl: '',
+		mobileMoreAnchorEl: '' 
 	};
 	
+	handleEvento(){
+        window.location.href=`/eventos/`
+	}
+
+	handleModalidade(){
+        window.location.href=`/modalidade/`
+	}
+
+	handleAjuda(){
+        window.location.href=`/ajuda/`
+	}
+
+	handlePerfil(){
+        window.location.href=`/perfil/`
+	}
+	handleHome(){
+		if(this.props.isAdmin){
+			window.location.href='/dashboard/'
+		}
+		else{
+			window.location.href='/atividades'
+		}
+        
+    }
 
 	render() {
 		
@@ -100,7 +123,8 @@ class Drawer extends React.Component {
 
 		const handleProfileMenuOpen = event => {
 			// setAnchorEl(event.currentTarget);
-			this.setState({achorEl: event.currentTarget});
+			this.setState({anchorEl: event.currentTarget});
+			console.log(this.state.anchorEl)
 		};
 
 		const handleMobileMenuClose = () => {
@@ -108,7 +132,7 @@ class Drawer extends React.Component {
 		};
 
 		const handleMenuClose = () => {
-			this.setState({achorEl: null});
+			this.setState({anchorEl: null});
 			handleMobileMenuClose();
 		};
 
@@ -133,7 +157,7 @@ class Drawer extends React.Component {
 				open={isMenuOpen}
 				onClose={handleMenuClose}
 			>
-				<MenuItem onClick={handleMenuClose}>Perfil</MenuItem>
+				<MenuItem onClick={() => this.handlePerfil()}>Perfil</MenuItem>
 				<MenuItem onClick={logout}>Logout</MenuItem>
 			</Menu>
 		);
@@ -147,6 +171,7 @@ class Drawer extends React.Component {
 				keepMounted
 				transformOrigin={{ vertical: 'top', horizontal: 'right' }}
 				open={isMobileMenuOpen}
+				// open={Boolean(this.state.anchorEl)}
 				onClose={handleMobileMenuClose}
 			>
 		{/* {console.log("is admin: "+this.props.isAdmin)} */}
@@ -159,47 +184,59 @@ class Drawer extends React.Component {
 			<AppBar position="static">
 				<Toolbar>
 				<Typography className={classes.title} variant="h6" noWrap>
-					Aticon
+					Aticom
 				</Typography>
 				<div className={classes.grow} />
 				<div className={classes.sectionDesktop}>
-				<IconButton aria-label="show 4 new mails" color="inherit">
-					
-						<AtividadesIcon />
-					</IconButton>
+					<Tooltip title={(this.props.isAdmin) ? 'Dashboard' : 'Atividades'}>
+						<IconButton color="inherit" onClick={() => this.handleHome()}>
+							<AtividadesIcon />
+						</IconButton>
+					</Tooltip>
+					<Tooltip title='Eventos'>
+						<IconButton  aria-label="show 4 new mails" color="inherit" onClick={() => this.handleEvento()}>
+							<Badge color="secondary">
+								<EventosIcon />
+							</Badge>
+						</IconButton>
+					</Tooltip>
 
-					<IconButton aria-label="show 4 new mails" color="inherit">
-					<Badge badgeContent={4} color="secondary">
-						<EventosIcon />
-					</Badge>
-					</IconButton>
+					{(this.props.isAdmin) ? 
 
+						<Tooltip title={'Modalidade'}>
+							<IconButton color="inherit" onClick={() => this.handleModalidade()}>
+								<DashboardIcon />
+							</IconButton>
+						</Tooltip> : null}
 
-					<IconButton aria-label="show 4 new mails" color="inherit">
-					<Badge badgeContent={4} color="secondary">
-						<MailIcon />
-					</Badge>
-					</IconButton>
-					<IconButton
-					edge="end"
-					aria-label="account of current user"
-					aria-controls={menuId}
-					aria-haspopup="true"
-					onClick={handleProfileMenuOpen}
-					color="inherit"
-					>
-					<AccountCircle />
-					</IconButton>
+					<Tooltip title={'Ajuda'}>
+						<IconButton color="inherit" onClick={() => this.handleAjuda()}>
+							<HelpOutlineIcon />
+						</IconButton>
+					</Tooltip>
+
+					<Tooltip title='Perfil'>
+						<IconButton
+							edge="end"
+							aria-label="account of current user"
+							aria-controls={menuId}
+							aria-haspopup="true"
+							onClick={(handleProfileMenuOpen)}
+							color="inherit"
+							>
+							<AccountCircle />
+						</IconButton>
+					</Tooltip>
 				</div>
 				<div className={classes.sectionMobile}>
 					<IconButton
-					aria-label="show more"
-					aria-controls={mobileMenuId}
-					aria-haspopup="true"
-					onClick={handleMobileMenuOpen}
-					color="inherit"
-					>
-					<MoreIcon />
+						aria-label="show more"
+						aria-controls={mobileMenuId}
+						aria-haspopup="true"
+						onClick={handleMobileMenuOpen}
+						color="inherit"
+						>
+						<MoreIcon />
 					</IconButton>
 				</div>
 				</Toolbar>

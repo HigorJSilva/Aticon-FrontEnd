@@ -1,13 +1,17 @@
 import React, { Component } from "react";
-import Dropzone from "../components/Dropzone";
-import Progress from "../components/Progress";
+import Dropzone from "../../components/Dropzone";
+import Progress from "../../components/Progress";
+import Button from '@material-ui/core/Button';
 
-import "../styles/upload.css";
-import api from '../services/api';
+import "../../styles/upload.css";
+import '../../styles/modal.css'
+import api from '../../services/api';
+import Swal from 'sweetalert2'
 
 class Upload extends Component {
   constructor(props) {
     super(props);
+    // console.log(props)
     this.state = {
       files: [],
       uploading: false,
@@ -30,15 +34,11 @@ class Upload extends Component {
   async uploadFiles() {
     this.setState({ uploadProgress: {}, uploading: true });
     const promises = this.sendRequest(this.state.files);
-    // this.state.files.forEach(file => {
-    //   promises.push(this.sendRequest(file));
-    // });
     try {
       await Promise.all(promises);
 
       this.setState({ successfullUploaded: true, uploading: false });
     } catch (e) {
-      // Not Production ready! Do some error handling here instead...
       this.setState({ successfullUploaded: true, uploading: false });
     }
   }
@@ -76,12 +76,46 @@ class Upload extends Component {
       for (let index = 0; index < certificados.length; index++) {
         formData.append("certificado[]", certificados[index],certificados[index].name);
        
+	  }
+	  
+		var self = this
+
+      api.post('/certificados/send', formData).then(function(result) {
+        // console.log( result)
+        if(result.data.success){
+          Swal.fire({
+            customClass: {
+              container: 'my-swal'
+            },
+            icon: 'success',
+            title: 'Certificados enviados',
+            text: 'Agora é só aguardar a correção',
+          }).then((result) => {
+           
+              self.props.fechar()
+          })
+        }
+        else{
+            Swal.fire({
+              customClass: {
+                container: 'my-swal'
+              },
+              icon: 'error',
+              title: 'Houve um erro',
+              text: result.data.message,
+			})
+			
+			  self.setState({ uploading: false, files: [], successfullUploaded: false  });
       }
 
-      // req.open("POST",   'http://localhost:3333/certificados/send',true);
-      req.open("POST",   api.defaults.baseURL+'/certificados/send',true);
+        self.props.onModalResponse(result.data.success)
+        // self.props.fechar()
+      });	
 
-      req.send(formData);
+      // // req.open("POST",   'http://localhost:3333/certificados/send',true);
+      // req.open("POST",   api.defaults.baseURL+'/certificados/send',true);
+
+      // req.send(formData);
 
     });
   }
@@ -109,19 +143,19 @@ class Upload extends Component {
   renderActions() {
       return (
         <div>
-          <button
+          <Button variant="outlined" style={{marginRight: '20px'}}
             onClick={() =>
               this.setState({ files: [], successfullUploaded: false })
             }
           >
-            Clear
-          </button>
-          <button
+            Limpar
+          </Button>
+          <Button variant="contained" color="primary"
           disabled={this.state.files.length < 0 || this.state.uploading}
           onClick={this.uploadFiles}
         >
-          Upload
-        </button>
+          Enviar
+        </Button>
       </div>
       );
   }
