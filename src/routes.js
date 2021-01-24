@@ -18,7 +18,8 @@ import AlterarDados from './pages/Perfil/AlterarDados'
 import recuperacaoSenha from './pages/Auth/recuperacaoSenha';
 import modalidade from './pages/Modalidade/modulos';
 import modaliadeCrud from './pages/Modalidade/modaliadeCrud';
-import upload2 from './pages/Atividades/upload2';
+import upload from './pages/Atividades/upload';
+import gerarPlanilha from './pages/Atividades/gerarPlanilha';
 
 function Routes(){
     return(
@@ -29,7 +30,8 @@ function Routes(){
                 <Route path="/ajuda" exact component ={faq} />
                 <Route exact path="/esquecisenha" component={recuperacaoSenha} />
 
-                <Route exact path="/upload2" component={upload2} />
+                <PrivateRoute exact path="/upload" roles={[Role.User, Role.CA]}  component={upload} />
+                <PrivateRoute exact path="/gerarPlanilha" roles={[Role.User, Role.CA]}  component={gerarPlanilha} />
 
 
                 <PrivateRoute exact path="/atividades" roles={[Role.User, Role.CA]} component={Index} />

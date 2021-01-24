@@ -84,6 +84,7 @@ class Perfil extends Component {
 
 			await api.post('/alterarSenha',newPost).then(function(result) {
 				if(result.data.success){
+					localStorage.removeItem('jtwToken')
 					Swal.fire('Senha Alterada','Suas credenciais foram alteradas','success').then((result) => {
 						if (result.value) {
 							window.location.reload(false);

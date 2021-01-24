@@ -124,7 +124,7 @@ class Drawer extends React.Component {
 		const handleProfileMenuOpen = event => {
 			// setAnchorEl(event.currentTarget);
 			this.setState({anchorEl: event.currentTarget});
-			console.log(this.state.anchorEl)
+			// console.log(this.state.anchorEl)
 		};
 
 		const handleMobileMenuClose = () => {

@@ -139,6 +139,7 @@ class New extends Component {
                     InputProps={{
                         readOnly: true,
                     }}
+                    disabled
                     variant="outlined"
                 />
 				

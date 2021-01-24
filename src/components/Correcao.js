@@ -3,6 +3,7 @@ import MaterialTable, { MTableToolbar } from 'material-table';
 import { forwardRef } from 'react';
 
 import AddIcon from '@material-ui/icons/Add';
+import VisibilityIcon from '@material-ui/icons/Visibility';
 import DescriptionIcon from '@material-ui/icons/Description';
 import ArrowUpward from '@material-ui/icons/ArrowUpward';
 import Check from '@material-ui/icons/Check';
@@ -52,7 +53,7 @@ const tableIcons = {
 	SortArrow: forwardRef((props, ref) => <ArrowUpward {...props} ref={ref} />),
 	ThirdStateCheck: forwardRef((props, ref) => <Remove color="primary" {...props} ref={ref} />),
 	ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />),
-	ViewCertificado: forwardRef((props, ref) => <DescriptionIcon color='primary' {...props} ref={ref} />)
+	ViewCertificado: forwardRef((props, ref) => <VisibilityIcon color='primary' {...props} ref={ref} />)
 };
 const MaterialTableDemo = (props ) => {
 	
@@ -154,7 +155,7 @@ const MaterialTableDemo = (props ) => {
 	
 	React.useEffect(() => {
 		onLoad();
-	});
+	},[]);
 
 	const [open, setOpen] = React.useState(false);
 
@@ -181,7 +182,7 @@ const MaterialTableDemo = (props ) => {
 	const sendFeedback = () => {
 
 		let {activeAtiv, ...feedbackPure } = feedback
-		console.log('feedbackPure :>> ', Object.entries(feedbackPure).length === 0);
+		// console.log('feedbackPure :>> ', Object.entries(feedbackPure).length === 0);
 
 		if(Object.entries(feedbackPure).length === 0){
 			

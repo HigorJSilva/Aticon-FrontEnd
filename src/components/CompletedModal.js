@@ -19,15 +19,15 @@ class Modal extends Component {
 		};
 		this.sweetAlert = this.sweetalertfunction.bind(this);
 		this.renderUpload = this.renderUploadfunction.bind(this);
-		this.handleTeste = this.handleTeste.bind(this);
+		this.certiResponse = this.certiResponse.bind(this);
     }
 
-    handleTeste(modalResponse){
-		this.setState({status: modalResponse});
-		console.log(this.state.status+' '+modalResponse)
-		
-		this.props.onModalResponse(modalResponse); 
-		return 1;
+    certiResponse(modalResponse){
+      this.setState({status: modalResponse});
+      console.log('Modadl response: >>',modalResponse)
+      
+      this.props.onModalResponse(modalResponse); 
+		  return 1;
   	}
 
     renderUploadfunction(){
@@ -36,7 +36,7 @@ class Modal extends Component {
 
       sweetalertfunction(self){
 
-	// console.log(self.handleTeste)
+	// console.log(self.certiResponse)
 		const modal = Swal.mixin({
 			customClass: {
 				confirmButton: 'MuiButton-root MuiButton-contained MuiButton-containedPrimary test',
@@ -62,9 +62,8 @@ class Modal extends Component {
             	if (result.value) { 
                 swal({
                   className: "upload-modal",
-                  confirmButtonText: 'Finalizar',
-                  
-                  content: (<Upload fechar={swal.close} onModalResponse={self.handleTeste} />),
+                  content: (<Upload fechar={swal.close} onModalResponse={self.certiResponse} />),
+                  footer: null
                 })  
               }
             })

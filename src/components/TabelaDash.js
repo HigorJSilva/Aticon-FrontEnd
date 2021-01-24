@@ -65,7 +65,7 @@ export default function MaterialTableDemo() {
 	
 	React.useEffect(() => {
 		onLoad();
-	});
+	},[]);
 
 	const handlePageChange = (props) => {
 		window.location.href=`/correcao/${props}`

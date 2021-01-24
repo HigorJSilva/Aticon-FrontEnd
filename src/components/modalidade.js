@@ -1,8 +1,7 @@
-import React, {useState} from 'react';
+import React from 'react';
 import MaterialTable from 'material-table';
 import { forwardRef } from 'react';
 
-import Box from '@material-ui/core/Box';
 import AddIcon from '@material-ui/icons/Add';
 import ArrowUpward from '@material-ui/icons/ArrowUpward';
 import Check from '@material-ui/icons/Check';
@@ -20,16 +19,8 @@ import Search from '@material-ui/icons/Search';
 import ViewColumn from '@material-ui/icons/ViewColumn';
 import Typography from "@material-ui/core/Typography";
 
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import TextField from "@material-ui/core/TextField";
-
-
 import api from '../services/api';
-import { Button, Divider, Fab, IconButton, setRef } from '@material-ui/core';
+import { Fab } from '@material-ui/core';
 import Swal from 'sweetalert2';
 
 
@@ -231,7 +222,7 @@ const MaterialTableDemo = (props ) => {
 								const data = modulos;
 
 								handleAddRef(props._id, newData).then(function(result) {
-									console.log('aaaa', newData)
+									// console.log('aaaa', newData)
 									data.push(newData);
 									Swal.fire({
 										icon: 'success',

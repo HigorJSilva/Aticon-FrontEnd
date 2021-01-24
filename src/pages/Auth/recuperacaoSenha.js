@@ -8,11 +8,6 @@ import LockIcon from '@material-ui/icons/Lock';
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-import Link from '@material-ui/core/Link';
-import InputLabel from '@material-ui/core/InputLabel';
-import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
-import MenuItem from '@material-ui/core/MenuItem';
 
 import {config} from '../../_helpers/config'
 import api from '../../services/api';
@@ -46,7 +41,7 @@ const styles = theme => ({
     margin: theme.spacing(3, 0, 2),
   },
 });
-//TODO: mudar os cookies em caso de alteração
+
 class RecupSenha extends Component {
     constructor(props) {
         super(props);

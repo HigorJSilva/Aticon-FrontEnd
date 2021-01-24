@@ -4,12 +4,10 @@ import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
-// import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import PersonOutlineIcon from '@material-ui/icons/PersonOutline';
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-import Link from '@material-ui/core/Link';
 import InputLabel from '@material-ui/core/InputLabel';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
@@ -47,70 +45,71 @@ const styles = theme => ({
     margin: theme.spacing(3, 0, 2),
   },
 });
-//TODO: mudar os cookies em caso de alteração
-class SignUp extends Component {
+
+class AlterarDados extends Component {
     constructor(props) {
         super(props);
-        let newUser = (JSON.parse(this.localStorage.getItem('jtwToken'))).user
+        this.userTemp = (JSON.parse(this.localStorage.getItem('jtwToken'))).user
 		
         this.state = {
-            nome: newUser.nome,
-            CPF: newUser.CPF,
-            matriz: newUser.matriz,
+            nome: this.userTemp.nome,
+            CPF: this.userTemp.CPF,
+			matriz: this.userTemp.matriz,
 
+            nomeErro: "",
             CPFErro: "",
+            matrizErro: "",
         };
     }
     localStorage = window.localStorage;
 
 
-	onSubmit(e){
+	async onSubmit(e){
 		e.preventDefault();
         let response = this.validate()
-        const sessionStore = (newUser) => this.saveJwt(newUser)
+		const sessionStore = this.saveJwt;
+
 		if(response.success){
 			const newPost = new FormData();
 			newPost.append('nome', this.state.nome);
 			newPost.append('CPF', this.state.CPF);
 			newPost.append('matriz', this.state.matriz);
-			api.post('/alterarDados',newPost).then(function(response) {
-               
-				if(response.data.success){
-                    const newUser = response.data.data
-					Swal.fire('Dados atualizados','Seus dados foram atualizados','success').then(
-						(result) => {
-							if (result.value) {
-                                sessionStore(newUser)
 
-                                window.location.href='/perfil'                           
-							}
+			const result = await api.post('/alterarDados',newPost);
+			if(result.data.success){
+				this.userTemp.nome = this.state.nome;
+				this.userTemp.CPF = this.state.CPF;
+				this.userTemp.matriz = this.state.matriz;
+				sessionStore(this.userTemp);
+				Swal.fire('Dados atualizados','Seus dados foram atualizados','success').then(
+					(result) => {
+						if (result.value) {
+
+							window.location.href='/perfil'                        
 						}
-					)
+					}
+				)
 
-				}else{
-					Swal.fire('Houve algo de errado',response.data.message,'error')
-
-				}
-
-			});	
-		}else{
+			}else{
+				Swal.fire('Houve algo de errado',response.data.message,'error')
+			}
+		}
+		else{
 			Swal.fire('Houve algo de errado',response.message,'error')
 		}
-	
     }
 
     saveJwt(user){
-        console.log(user);
+   
         let obj = { user }
-        console.log(obj)
-        this.localStorage.removeItem('jtwToken')
+        localStorage.removeItem('jtwToken')
         localStorage.setItem('jtwToken', JSON.stringify(obj));
 
     }
 
 	validate(){
 		const validarCpf = require('validar-cpf');
-		this.setState( { CPFErro:''} );
+		// this.setState( { CPFErro:"", nomeErro:"", matriz:""} );
 		let response = {
 			success: true,
 			message: ''
@@ -158,7 +157,6 @@ class SignUp extends Component {
 
 					<Grid item xs={12}  style={{marginBottom:'-8px'}}>
 						<TextField
-						autoComplete="nome"
 						name="nome"
 						variant="outlined"
 						required
@@ -166,7 +164,9 @@ class SignUp extends Component {
 						id="nome"
 						label="Nome Completo"
                         onChange={e => this.change(e)}
-                        value={this.state.nome}
+						value={this.state.nome}
+						error={this.state.nomeErro}
+				        helperText={this.state.nomeErro}
 						autoFocus
 						/>
 					</Grid>
@@ -230,4 +230,4 @@ class SignUp extends Component {
     );
   }
 }
-export default withStyles(styles) (SignUp)
+export default withStyles(styles) (AlterarDados)

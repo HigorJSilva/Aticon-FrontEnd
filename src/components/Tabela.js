@@ -23,7 +23,6 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import api from '../services/api';
 import { Fab } from '@material-ui/core';
 import Swal from 'sweetalert2';
-import { config } from '../_helpers/config';
 
 const tableIcons = {
 	Add: forwardRef((props, ref) => <Fab  color='primary'>
@@ -47,20 +46,13 @@ const tableIcons = {
 	ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />)
 };
 
-export default function MaterialTableDemo() {
+export default function MaterialTableDemo(props) {
 
 	var  titulos =[];
-	const options = config.referencia.map((option) => {
-		// console.log(option.modulo)
-		const modulo = option.modulo[0].toUpperCase();
-		titulos.push(option.titulo)
-		return {
-		  modulo: /[0-9]/.test(modulo) ? '0-9' : modulo,
-		  ...option,
-		};
-	  });
 
-
+	const [opt, setOpt] = React.useState(props.options);
+	const valueOption = props.titulos;
+	
   	const [state, setState] = React.useState({
 		
 	titulo: <div>
@@ -107,9 +99,9 @@ export default function MaterialTableDemo() {
 					id="referencia"
 					disableClearable
 					size="small"
-					value={config.referencia[titulos.indexOf(props.value)]}
-					options={config.referencia}
-					// groupBy={(option) => 'Módulo '+option.modulo}
+					value={opt[valueOption.indexOf(props.value)]}
+					options={opt}
+					// groupBy={(option) => option.modulo}
 					getOptionLabel={(option) => option.titulo}
 					renderInput={(params) => { 
 						return(
@@ -145,7 +137,6 @@ export default function MaterialTableDemo() {
 			onChange={e => props.onChange(e.target.value)}
 		/> )
 		},
-		//TODO: width 100%
 		{
 			title: 'Modalidade',
 			field: 'modalidade',
@@ -207,7 +198,7 @@ export default function MaterialTableDemo() {
 	
 	React.useEffect(() => {
 		onLoad();
-	},);
+	},[]);
 
 	// salvar dados
   async function handleSend(e){
@@ -246,11 +237,9 @@ async function handleUpdate(e){
 async function handleDelete(e){
 
 	return await api.get('/remove/'+ e._id).then(function(result) {
-		console.log( result.data.success)
 		return result.data.success
 	});	
 }
-
 
   return (
 
@@ -266,11 +255,10 @@ async function handleDelete(e){
       editable={{
         onRowAdd: newData =>
           new Promise(resolve => {
-            setTimeout( async () => {
+            setTimeout(  () => {
 				resolve();
 				const data = [...state.data];
-				await handleSend(newData).then(function(result) {
-					console.log(result.success)
+				handleSend(newData).then(function(result) {
 					if(result.success){
 						newData.horasCertificado > 40 ? newData.horasConsideradas = 40 : newData.horasConsideradas = newData.horasCertificado
 						newData._id =  result.message;
@@ -297,7 +285,7 @@ async function handleDelete(e){
             setTimeout(async () => {
               resolve();
 			  
-			  await handleUpdate(newData).then(function(result) {
+			   handleUpdate(newData).then(function(result) {
 				//   console.log(result.success)
 				if(result.success){
 
@@ -329,7 +317,7 @@ async function handleDelete(e){
             setTimeout(async () => {
               resolve();
 			  const data = [...state.data];
-			  await handleDelete(oldData).then(function(result) {
+			   handleDelete(oldData).then(function(result) {
 				if(result){
 					data.splice(data.indexOf(oldData), 1);
 					  setState({ ...state, data });

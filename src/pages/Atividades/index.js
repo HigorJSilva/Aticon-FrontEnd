@@ -2,11 +2,12 @@ import React, { Component } from 'react';
 import {lighten, withStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Box from '@material-ui/core/Box';
-import {Card, CardContent, Button} from '@material-ui/core/';
+import {Card, CardContent, Button, CircularProgress} from '@material-ui/core/';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import Tabela from '../../components/Tabela';
+import TabelaSkeleton from '../../components/TabelaSkeleton';
 import SendModal from '../../components/CompletedModal';
 
 import { config } from '../../_helpers/config';
@@ -59,55 +60,77 @@ class Index extends Component {
 			modulo: [],
 			cargaHoraria: '',
 			status:false,
+			completo:false,
 		};
 	  }
 
 	  localStorage = window.localStorage;
-//TODO: trocar por criptografado e por acesso ao modelo matriz
 	async getDados(){
 		let response = [];
 		response = await api.get('/modulos');
+		let modulos =  await api.get('/modulo');
+		var opcoes = []
+		var titulos = []
+		var spec = [];
+	
+		spec.modulo1 = {'max': (modulos.data.find(x=> x.nome === "Módulo 1" )).cargaHorariaMax,
+						'min':	(modulos.data.find(x=> x.nome === "Módulo 1" )).cargaHorariaMin }
 
+		spec.modulo2 = {'max': (modulos.data.find(x=> x.nome === "Módulo 2" )).cargaHorariaMax,
+		'min':	(modulos.data.find(x=> x.nome === "Módulo 2" )).cargaHorariaMin }
+
+		spec.modulo3 = {'max': (modulos.data.find(x=> x.nome === "Módulo 3" )).cargaHorariaMax,
+		'min':	(modulos.data.find(x=> x.nome === "Módulo 3" )).cargaHorariaMin }
+
+		modulos.data.forEach(element => {
+			element.atividades.forEach(atividades => {
+				opcoes.push({'titulo': atividades, 'modulo': element.nome })
+				titulos.push(atividades)
+				
+			});
+		});
+		// console.log('spec :>> ', spec);
 		try{
 
 			var cookie = (JSON.parse(this.localStorage.getItem('jtwToken'))).user;
 			var matriz = cookie.matriz;
 			var status = cookie.isPendente;
+			var completo = cookie.isCompleto;
 			var cargaHoraria = (config.matrizes.find(x => x.ano === matriz)).cargaHoraria;
-			this.setState({ modulo: response.data, cargaHoraria: cargaHoraria , status: status});
+			this.setState({ modulo: response.data, cargaHoraria: cargaHoraria , status: status,
+				 options: opcoes, titulos: titulos, spec: spec, completo: completo });
 
+				//  console.log('this.state.spec :>> ', this.state.spec.modulo1);
 		}catch(Exception){
 			window.location.href='/login/'
 		}
 		
 	}
-	//TODO: fazer escolha de matriz na planilha
 	async gerarPlanilha(){
-		let fileLocation = [];
-		fileLocation = await api.get('/gerarPlanilha');
+		window.location.href="/gerarPlanilha"
+		// let fileLocation = [];
+		// fileLocation = await api.get('/gerarPlanilha');
 
-		setTimeout(() => {
+		// setTimeout(() => {
 
-			Swal.fire({
-				icon: 'success',
-				title: 'Planilha gerada',
-				html: "<a href="+api.defaults.baseURL+ '/files/planilhas/'+fileLocation.data+"> Baixar planilha </a>",
-				showConfirmButton: true,
-				confirmButtonText:'Retornar'
-			  }).then((result) => {
-					api.get('/deletarPlanilha');
-			  })    
+		// 	Swal.fire({
+		// 		icon: 'success',
+		// 		title: 'Planilha gerada',
+		// 		html: "<a href="+api.defaults.baseURL+ '/files/planilhas/'+fileLocation.data+"> Baixar planilha </a>",
+		// 		showConfirmButton: true,
+		// 		confirmButtonText:'Retornar'
+		// 	  }).then((result) => {
+		// 			api.get('/deletarPlanilha');
+		// 	  })    
 			
-		  }, 100);
+		//   }, 100);
 
 	}
 	
 
-	//TODO config resposta de envio dos certificados em <CompletedModal/> e <upload>
 	 handleMondalResponse = async (modalResponse) => {
 		if(modalResponse){
 			var userData = await JSON.parse(this.localStorage.getItem('jtwToken'))
-			console.log(userData)
 			userData.user.isPendente = true;
 			await this.localStorage.setItem('jtwToken', JSON.stringify(userData))
 			this.setState({status: modalResponse})
@@ -119,15 +142,16 @@ class Index extends Component {
 		
 	}
 
-	componentDidUpdate(){		
-		this.getDados();
+	async componentDidUpdate(){		
+		let response = [];
+		response = await api.get('/modulos');
+		this.setState({ modulo: response.data});
 	}
 
 	normalise = value => (value * 100) / this.state.cargaHoraria;
 
   render() {
 	const { classes } = this.props;
-
 	const BorderLinearProgress = withStyles({
 		root: {
 		  height: 10,
@@ -140,12 +164,19 @@ class Index extends Component {
 		  backgroundColor: '#009C4D',
 		},
 	  })(LinearProgress);
+
 //TODO: alterar para recarregar a cada alteração
-	  const alunoProgresso = (this.state.modulo.modulo1 >= this.state.cargaHoraria * 0.3 && this.state.modulo.modulo2 >= this.state.cargaHoraria * 0.15
-		&& this.state.modulo.modulo3 >= this.state.cargaHoraria * 0.15 && this.state.modulo.presencial >= 50
+
+	  const alunoProgresso = (this.state.modulo.modulo1 >= this.state.cargaHoraria * (this.state.spec?.modulo1.min)/100 
+		&& this.state.modulo.modulo2 >= this.state.cargaHoraria *  (this.state.spec?.modulo2.min)/100 
+		&& this.state.modulo.modulo3 >= this.state.cargaHoraria * (this.state.spec?.modulo3.min)/100 
+		&& this.state.modulo.presencial >= 50
 		&& this.state.modulo.total >= this.state.cargaHoraria) ?
 			<Grid item xs={10} style={{alignSelf: 'center'}} >
-				<SendModal onModalResponse={this.handleMondalResponse} disabled={this.state.status}/> 
+				{this.state.completo ?  <Button  variant="outlined" color='secondary' fullWidth
+										onClick={this.gerarPlanilha}> Gerar planilha</Button> :
+				
+										<SendModal onModalResponse={this.handleMondalResponse} disabled={this.state.status}/> }
 			</Grid>
 			:
 			<> 
@@ -181,8 +212,6 @@ class Index extends Component {
 			Acompanhe seu progresso
 		</Typography>
 
-		<Button onClick={this.gerarPlanilha}> Gerar planilha</Button>
-
 			<Box className={classes.progressoContainer}>
 				
 					 <Card className={classes.card} >
@@ -210,8 +239,8 @@ class Index extends Component {
 
 													{/* {this.state.modulo.modulo1 >= 45 ? '/105 horas max.' 
 													: '/45 horas min.' } */}
-													{this.state.modulo.modulo1 >= this.state.cargaHoraria * 0.3 ?  this.state.cargaHoraria * 0.7 - this.state.modulo.modulo1+' Horas disponíveis' 
-													: this.state.cargaHoraria * 0.3 - this.state.modulo.modulo1+' Horas restantes' }
+													{this.state.modulo.modulo1 >= this.state.cargaHoraria * (this.state.spec?.modulo1.min)/100  ?  this.state.cargaHoraria * (this.state.spec?.modulo1.max)/100 - this.state.modulo.modulo1+' Horas disponíveis' 
+													: this.state.cargaHoraria * (this.state.spec?.modulo1.min)/100  - this.state.modulo.modulo1+' Horas restantes' }
 
 												</Typography>
 											
@@ -249,8 +278,8 @@ class Index extends Component {
 
 												{/* {this.state.modulo.modulo2 >= 22.5 ? '/75 horas max.' 
 													: '/22.5 horas min.' }		 */}
-													{this.state.modulo.modulo2 >= this.state.cargaHoraria * 0.15 ? this.state.cargaHoraria * 0.5 - this.state.modulo.modulo2+' Horas disponíveis' 
-													: this.state.cargaHoraria * 0.15 - this.state.modulo.modulo2+' Horas restantes' }
+													{this.state.modulo.modulo2 >= this.state.cargaHoraria * (this.state.spec?.modulo2.min)/100 ? this.state.cargaHoraria * (this.state.spec?.modulo2.max)/100 - this.state.modulo.modulo2+' Horas disponíveis' 
+													: this.state.cargaHoraria * (this.state.spec?.modulo2.min)/100 - this.state.modulo.modulo2+' Horas restantes' }
 												</Typography>
 											
 											</Grid>
@@ -286,8 +315,8 @@ class Index extends Component {
 												<Typography variant="body2" gutterBottom>
 													{/* {this.state.modulo.modulo3 >= 22.5 ? '/75 horas max.' 
 													: '/22.5 horas min.' }		 */}
-														{this.state.modulo.modulo3 >= this.state.cargaHoraria * 0.15 ? this.state.cargaHoraria * 0.5 - this.state.modulo.modulo3+' Horas disponíveis' 
-															: this.state.cargaHoraria * 0.15 - this.state.modulo.modulo3+' Horas restantes' }
+														{this.state.modulo.modulo3 >= this.state.cargaHoraria * (this.state.spec?.modulo3.min)/100 ? this.state.cargaHoraria * (this.state.spec?.modulo3.max)/100 - this.state.modulo.modulo3+' Horas disponíveis' 
+															: this.state.cargaHoraria * (this.state.spec?.modulo3.min)/100 - this.state.modulo.modulo3+' Horas restantes' }
 
 														
 
@@ -339,7 +368,8 @@ class Index extends Component {
 			 <Box className={classes.progressBar}> 
 					{alunoProgresso}
 			</Box>
-			<Tabela/>
+			{(!this.state.options) ? <CircularProgress /> : (this.state.status) ? <TabelaSkeleton/> : <Tabela options={this.state.options} titulos={this.state.titulos}/> }
+			
 			
         </Box>
 		</div>
