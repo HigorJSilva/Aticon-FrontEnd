@@ -53,27 +53,23 @@ export default function MaterialTableDemo(props) {
 	const [opt, setOpt] = React.useState(props.options);
 	const valueOption = props.titulos;
 	
-  	const [state, setState] = React.useState({
-		
-	titulo: <div>
-	<Typography  style={{display: 'inline-block'}} variant='h6' color={'secondary'}  bottomspace={'small'}> 
-		Atividades Complementares 
-  	</Typography>
-  	<Typography color={'textSecondary'} style={{display: 'inline-block', marginLeft:'10px'}} >
- 		Cadasatre aqui suas atividades
-	</Typography>
- 	</div>
- 
-  ,
-  
-  
+	const [tabeleOptions, setTabeleOptions] = React.useState({
+		titulo: <div>
+		<Typography  style={{display: 'inline-block'}} variant='h6' color={'secondary'}  bottomspace={'small'}> 
+			Atividades Complementares 
+		  </Typography>
+		  <Typography color={'textSecondary'} style={{display: 'inline-block', marginLeft:'10px'}} >
+			 Cadasatre aqui suas atividades
+		</Typography>
+		 </div>,
+
 	columns: [
 		{ title: 'Descrição', field: 'descricao',
 		cellStyle: {
 			minWidth: 150,
 			maxWidth: 250,
 			paddingRight:'0px'
-		  },
+		},
 		
 		editComponent: props => (
 			<TextField
@@ -93,7 +89,7 @@ export default function MaterialTableDemo(props) {
 		cellStyle: {
 			minWidth: 250,
 			maxWidth: 300
-		  },
+		},
 		editComponent: props => (
 				<Autocomplete
 					id="referencia"
@@ -122,18 +118,18 @@ export default function MaterialTableDemo(props) {
 		{ title: 'Id', field: '_id', hidden:true,
 			cellStyle: {
 				display: 'none',
-		  },
-		  headerStyle: {
+		},
+		headerStyle: {
 				display: 'none',
 				
-		  },
-		  editComponent: props => (
+		},
+		editComponent: props => (
 			<TextField
 				value={props.value}
 				multiline={true}
 				InputLabelProps={{
 				shrink: true
-			  }}
+			}}
 			onChange={e => props.onChange(e.target.value)}
 		/> )
 		},
@@ -168,7 +164,7 @@ export default function MaterialTableDemo(props) {
 				inputProps={{ min: 0}}
 				InputLabelProps={{
 					shrink: true
-			  	}}
+				}}
 			onChange={e => props.onChange(e.target.value)}
 		/> )},
 		{ title: 'Hrs. Consedeiradas', field: 'horasConsideradas', type: 'numeric', headerStyle:{
@@ -182,12 +178,15 @@ export default function MaterialTableDemo(props) {
 				value={props.value}
 				InputLabelProps={{
 				shrink: true
-			  }}
+			}}
 			onChange={e => props.onChange(e.target.value)}
 		/> )}
-  ],
-    data: [],
-  });
+	],
+	})
+
+  	const [state, setState] = React.useState({
+    	data: [],
+  	});
 
 
   // Inicialização dos dados
@@ -246,8 +245,8 @@ async function handleDelete(e){
 	<>
 	<MaterialTable
 		icons={tableIcons}
-		title={state.titulo}
-		columns={state.columns}
+		title={tabeleOptions.titulo}
+		columns={tabeleOptions.columns}
 		data={state.data}
 		options={{
 			actionsColumnIndex: -1,
@@ -256,14 +255,17 @@ async function handleDelete(e){
         onRowAdd: newData =>
           new Promise(resolve => {
             setTimeout(  () => {
-				resolve();
+				
 				const data = [...state.data];
 				handleSend(newData).then(function(result) {
 					if(result.success){
+						console.log('result.success :>> ', 'result.success');
 						newData.horasCertificado > 40 ? newData.horasConsideradas = 40 : newData.horasConsideradas = newData.horasCertificado
 						newData._id =  result.message;
 						data.push(newData);
-						setState({ ...state, data });
+						console.log('pre SetState :>> ', 'pre SetState');
+						setState({ ...state, data: data });
+						console.log('pos SetState :>> ', 'pos SetState');
 						Swal.fire({
 							icon: 'success',
 							title: 'Atividade cadastrada',
@@ -278,21 +280,22 @@ async function handleDelete(e){
 					}
 					
 				});
+				resolve();
 				}, 600);
           }),
 		  onRowUpdate: (newData, oldData) =>
           new Promise(resolve => {
             setTimeout(async () => {
-              resolve();
 			  
 			   handleUpdate(newData).then(function(result) {
 				//   console.log(result.success)
 				if(result.success){
+					
 
 					const data = [...state.data];
 					newData.horasCertificado>40 ? newData.horasConsideradas = 40 : newData.horasConsideradas = newData.horasCertificado
 					data[data.indexOf(oldData)] = newData;
-					  setState({ ...state, data });
+					  setState({ ...state, data:data });
 					  Swal.fire({
 						icon: 'success',
 						title: 'Atividade alterada',
@@ -309,13 +312,14 @@ async function handleDelete(e){
 				
 			});
 			//   data[data.indexOf(oldData)] = newData;
-            //   setState({ ...state, data });
+			//   setState({ ...state, data });
+			resolve();
             }, 600);
           }),
         onRowDelete: oldData =>
           new Promise(resolve => {
             setTimeout(async () => {
-              resolve();
+             
 			  const data = [...state.data];
 			   handleDelete(oldData).then(function(result) {
 				if(result){
@@ -334,6 +338,7 @@ async function handleDelete(e){
 					})
 				}
 			  });
+			  resolve();
             }, 600);
           }),
 	  }}

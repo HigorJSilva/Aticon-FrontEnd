@@ -2,6 +2,7 @@ import React from 'react';
 import MaterialTable, { MTableToolbar } from 'material-table';
 import { forwardRef } from 'react';
 
+import axios from "axios";
 import AddIcon from '@material-ui/icons/Add';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import DescriptionIcon from '@material-ui/icons/Description';
@@ -202,7 +203,7 @@ const MaterialTableDemo = (props ) => {
 			const avaliacao = new FormData();
 			avaliacao.append('feedback',JSON.stringify(feedback));
 
-			api.get('/avaliacao/corrigir/'+props.userId);
+			api.post('/avaliacao/'+props.userId,avaliacao);
 
 			Swal.fire( 'Feedback cadastrado', 'O aluno será notificado', 'success').then((result) => {
 				if (result.dismiss === Swal.DismissReason.backdrop || result.isConfirmed) {
@@ -233,9 +234,40 @@ const MaterialTableDemo = (props ) => {
 			}
 		  }
 
-		window.open(api.defaults.baseURL+ '/files/certificados/'+state.data[i].certificado)
+		// window.open(api.defaults.baseURL+ '/files/certificados/'+state.data[i].certificado)
+		// var result = await api.get(`exibirCertificado/${state.data[i].certificado}`)
+
+		// var file = new Blob([result.data], {type: 'application/pdf'});
+		// var fileURL = URL.createObjectURL(file);
+		// window.open(fileURL);
+
+		// URL.createObjectURL(result.data)
+
+		api.get(`exibirCertificado/${state.data[i].certificado}`, {
+			method: "GET",
+			responseType: "blob"
+			//Force to receive data in a Blob Format
+		})
+		.then(response => {
+			//Create a Blob from the PDF Stream
+			const file = new Blob([response.data], {
+				type: "application/pdf"
+			});
+			console.log('fileUELD :>> ', file);
+			//Build a URL from the file
+			const fileURL = URL.createObjectURL(file);
+			console.log('fileUELD :>> ', file);
+			//Open the URL on new Window
+			window.open(fileURL);
+		})
+		.catch(error => {
+			console.log(error);
+		});
+
 
 	}
+
+	
 
   return (
 

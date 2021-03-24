@@ -86,7 +86,7 @@ export default class CustomizedExpansionPanels extends React.Component {
                 await api.get(`/ajuda/remove/${perguntaId}`).then(function(result) {
                     if(result.data.success){
                         Swal.fire(
-                            'Deletado!',
+                            'Pergunta Deletada',
                             'A pergunta foi deletada',
                             'success'
                         ).then((result) =>{

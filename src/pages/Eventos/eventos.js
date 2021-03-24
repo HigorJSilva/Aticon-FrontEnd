@@ -107,7 +107,7 @@ class Feed extends Component{
                 await api.get(`/eventos/remove/${eventoId}`).then(function(result) {
                     if(result.data.success){
                         swal.fire(
-                            'Deletado!',
+                            'Evento Deletado',
                             'O evento foi deletado',
                             'success'
                         ).then((result) =>{

@@ -121,12 +121,12 @@ class Perfil extends Component {
 		if ( !(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,32}$/.test(this.state.senhaAtual))){
 			response.success = false; 
 			response.message = 'Algum(ns) campo(s) falharam a validação';
-			this.setState({senhaAtualErro: 'A senha atual possui mais de 7 digitos, uma letra maiúscula, uma letra minúscula e um número'})
+			this.setState({senhaAtualErro: 'A senha atual possui mais de 7 dígitos, uma letra maiúscula, uma letra minúscula e um número'})
 		}
 		if ( !(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,32}$/.test(this.state.novaSenha))){
 			response.success = false; 
 			response.message = 'Algum(ns) campo(s) falharam a validação';
-			this.setState({novaSenhaErro: 'A nova senha precisa ter mais de 7 digitos, uma letra maiúscula, uma letra minúscula e um número'})
+			this.setState({novaSenhaErro: 'A nova senha precisa ter mais de 7 dígitos, uma letra maiúscula, uma letra minúscula e um número'})
 		}
 		console.log(!(this.state.confirmaSenha === this.state.novaSenha))
 		if ( !(this.state.confirmaSenha === this.state.novaSenha)){

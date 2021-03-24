@@ -78,7 +78,7 @@ class FAQCRUD extends Component {
 				if(result.data.success){
 					swal.fire({
 						icon: 'success',
-						title: 'Pergunta cadastada',
+						title: 'Pergunta cadastrada',
 						text: 'Deseja cadastrar outra?',
 						showCancelButton: true,
 						cancelButtonText: 'Não',

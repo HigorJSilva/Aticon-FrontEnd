@@ -181,7 +181,7 @@ class Index extends Component {
 			:
 			<> 
 			<Grid item xs={10} style={{alignSelf: 'center'}} >
-				<BorderLinearProgress variant="determinate"  color="secondary" value={
+				<BorderLinearProgress variant="determinate"  color="secondary" value={ 
 					this.normalise(this.state.modulo.total)
 					} /> 
 			</Grid>

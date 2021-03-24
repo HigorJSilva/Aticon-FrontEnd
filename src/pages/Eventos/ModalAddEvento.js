@@ -14,7 +14,6 @@ import Avatar from '@material-ui/core/Avatar';
 import EventIcon from '@material-ui/icons/Event';
 import swal from 'sweetalert2';
 
-//TODO: tratamento de erro p/ campos vazios e inválidos
 const styles = theme => ({
     '@global': {
       body: {
@@ -89,7 +88,7 @@ class New extends Component {
 				if(result.data.success){
 					swal.fire({
 						icon: 'success',
-						title: 'Evento cadastado',
+						title: 'Evento cadastrado',
 						text: 'Deseja cadastrar outro?',
 						showCancelButton: true,
 						cancelButtonText: 'Não',
